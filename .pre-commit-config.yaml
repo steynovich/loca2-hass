@@ -1,0 +1,66 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.9
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: uv run mypy
+        language: system
+        types: [python]
+        args: [--ignore-missing-imports]
+
+  - repo: local
+    hooks:
+      - id: manifest-validation
+        name: Validate manifest.json
+        entry: uv run python
+        language: system
+        args:
+          - -c
+          - |
+            import json
+            with open('custom_components/loca2/manifest.json') as f:
+                manifest = json.load(f)
+            required = ['domain', 'name', 'version', 'documentation', 'issue_tracker', 'codeowners', 'requirements', 'iot_class', 'config_flow']
+            for field in required:
+                assert field in manifest, f'Missing field: {field}'
+            print('✅ Manifest validation passed')
+        files: ^custom_components/loca2/manifest\.json$
+
+      - id: strings-validation
+        name: Validate strings.json
+        entry: uv run python
+        language: system
+        args:
+          - -c
+          - |
+            import json
+            with open('custom_components/loca2/strings.json') as f:
+                strings = json.load(f)
+            assert 'config' in strings, 'Missing config section'
+            assert 'step' in strings['config'], 'Missing config.step section'
+            assert 'user' in strings['config']['step'], 'Missing config.step.user section'
+            print('✅ Strings validation passed')
+        files: ^custom_components/loca2/strings\.json$

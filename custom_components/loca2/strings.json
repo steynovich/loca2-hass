@@ -1,0 +1,57 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Loca2 Device Tracker",
+        "description": "Set up your Loca2 integration to track device locations.",
+        "data": {
+          "username": "Username",
+          "password": "Password",
+          "base_url": "API Base URL",
+          "scan_interval": "Scan Interval (seconds)",
+          "timeout": "Request Timeout (seconds)"
+        },
+        "data_description": {
+          "username": "Your Loca2 username for authentication",
+          "password": "Your Loca2 password",
+          "base_url": "The base URL of the Loca2 API server (default: https://www.mijnloca.nl)",
+          "scan_interval": "How often to poll for location updates (10-300 seconds)",
+          "timeout": "Timeout for API requests in seconds"
+        }
+      }
+    },
+    "error": {
+      "auth_failed": "Authentication failed. Please check your username and password and try again.",
+      "cannot_connect": "Failed to connect to the Loca2 API. Please check your base URL and network connection.",
+      "timeout": "Request timed out. Please check your network connection and try again.",
+      "unknown": "Unexpected error occurred. Please check the logs for more details."
+    },
+    "abort": {
+      "already_configured": "This Loca2 integration is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Loca2 Options",
+        "description": "Configure advanced options for your Loca2 integration.",
+        "data": {
+          "scan_interval": "Scan Interval (seconds)",
+          "timeout": "Request Timeout (seconds)",
+          "disabled_devices": "Disabled Devices"
+        },
+        "data_description": {
+          "scan_interval": "How often to poll for location updates (10-300 seconds)",
+          "timeout": "Timeout for API requests in seconds (1-120 seconds)",
+          "disabled_devices": "Select devices to disable from tracking"
+        }
+      }
+    },
+    "error": {
+      "invalid_scan_interval": "Scan interval must be between 10 and 300 seconds.",
+      "invalid_timeout": "Timeout must be between 1 and 120 seconds.",
+      "invalid_device_list": "Invalid device selection. Please try again.",
+      "unknown": "Unexpected error occurred. Please check the logs for more details."
+    }
+  }
+}

@@ -1,0 +1,151 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv sync --extra dev
+
+    - name: Lint with ruff
+      run: |
+        uv run ruff check custom_components/ tests/
+
+    - name: Format check with black
+      run: |
+        uv run black --check custom_components/ tests/
+
+    - name: Type check with mypy
+      run: |
+        uv run mypy custom_components/loca2/
+
+    - name: Run tests
+      run: |
+        uv run pytest tests/ -v --cov=custom_components/loca2 --cov-report=xml --cov-report=term-missing
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  validate:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv sync --extra dev
+
+    - name: Run Home Assistant validation
+      run: |
+        uv run python tests/test_comprehensive_validation.py
+
+    - name: Run HACS validation
+      run: |
+        uv run pytest tests/test_hacs_validation.py -v
+
+    - name: Validate manifest
+      run: |
+        uv run python -c "
+        import json
+        with open('custom_components/loca2/manifest.json') as f:
+            manifest = json.load(f)
+        required_fields = ['domain', 'name', 'version', 'documentation', 'issue_tracker', 'codeowners', 'requirements', 'iot_class', 'config_flow']
+        for field in required_fields:
+            assert field in manifest, f'Missing required field: {field}'
+        print('✅ Manifest validation passed')
+        "
+
+  hacs-validation:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: HACS validation
+      uses: hacs/action@main
+      with:
+        category: integration
+
+  hassfest:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Home Assistant hassfest validation
+      uses: home-assistant/actions/hassfest@master
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv sync --extra dev
+
+    - name: Run integration tests
+      run: |
+        uv run pytest tests/test_integration.py -v --tb=short
+
+    - name: Run comprehensive validation
+      run: |
+        uv run pytest tests/test_comprehensive_validation.py -v --tb=short
+
+    - name: Run final validation
+      run: |
+        uv run pytest tests/test_final_validation.py -v --tb=short

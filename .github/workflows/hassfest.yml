@@ -1,0 +1,187 @@
+name: Home Assistant Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  hassfest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Home Assistant hassfest validation
+      uses: home-assistant/actions/hassfest@master
+
+  home-assistant-integration-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install Home Assistant
+      run: |
+        uv add homeassistant --no-sync
+
+    - name: Test integration loading
+      run: |
+        uv run python -c "
+        import sys
+        import os
+        sys.path.insert(0, os.getcwd())
+        
+        try:
+            from custom_components.loca2 import async_setup_entry, async_unload_entry
+            from custom_components.loca2.config_flow import Loca2ConfigFlow
+            from custom_components.loca2.api import Loca2ApiClient, Loca2Device, Loca2Location
+            from custom_components.loca2.device_tracker import Loca2DeviceTracker
+            from custom_components.loca2.const import DOMAIN
+            print('✅ All integration components imported successfully')
+        except ImportError as e:
+            print(f'❌ Import error: {e}')
+            sys.exit(1)
+        "
+
+  manifest-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Validate manifest against Home Assistant requirements
+      run: |
+        uv run python -c "
+        import json
+        import sys
+        
+        with open('custom_components/loca2/manifest.json') as f:
+            manifest = json.load(f)
+        
+        # Home Assistant required fields
+        ha_required = [
+            'domain', 'name', 'version', 'documentation', 'issue_tracker',
+            'codeowners', 'requirements', 'iot_class', 'config_flow'
+        ]
+        
+        errors = []
+        
+        for field in ha_required:
+            if field not in manifest:
+                errors.append(f'Missing Home Assistant required field: {field}')
+        
+        # Validate domain format
+        if 'domain' in manifest:
+            domain = manifest['domain']
+            if not domain.islower():
+                errors.append('Domain must be lowercase')
+            if not domain.replace('_', '').isalnum():
+                errors.append('Domain must be alphanumeric (underscores allowed)')
+        
+        # Validate requirements format
+        if 'requirements' in manifest:
+            if not isinstance(manifest['requirements'], list):
+                errors.append('Requirements must be a list')
+        
+        # Validate config_flow
+        if 'config_flow' in manifest:
+            if manifest['config_flow'] is not True:
+                errors.append('Config flow must be True for UI configuration')
+        
+        if errors:
+            print('❌ Home Assistant manifest validation failed:')
+            for error in errors:
+                print(f'  - {error}')
+            sys.exit(1)
+        else:
+            print('✅ Home Assistant manifest validation passed')
+        "
+
+  async-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv add homeassistant aiohttp --no-sync
+
+    - name: Validate async implementation
+      run: |
+        uv run python -c "
+        import sys
+        import os
+        import inspect
+        sys.path.insert(0, os.getcwd())
+        
+        try:
+            from custom_components.loca2 import async_setup_entry, async_unload_entry
+            from custom_components.loca2.api import Loca2ApiClient
+            from custom_components.loca2.device_tracker import Loca2DeviceTracker
+            
+            errors = []
+            
+            # Check main entry points are async
+            if not inspect.iscoroutinefunction(async_setup_entry):
+                errors.append('async_setup_entry must be async')
+            if not inspect.iscoroutinefunction(async_unload_entry):
+                errors.append('async_unload_entry must be async')
+            
+            # Check API client methods are async
+            api_methods = ['test_connection', 'get_devices', 'get_device_location', 'close']
+            for method_name in api_methods:
+                if hasattr(Loca2ApiClient, method_name):
+                    method = getattr(Loca2ApiClient, method_name)
+                    if not inspect.iscoroutinefunction(method):
+                        errors.append(f'API method {method_name} must be async')
+            
+            # Check device tracker update method is async
+            if hasattr(Loca2DeviceTracker, 'async_update'):
+                if not inspect.iscoroutinefunction(Loca2DeviceTracker.async_update):
+                    errors.append('DeviceTracker.async_update must be async')
+            
+            if errors:
+                print('❌ Async validation failed:')
+                for error in errors:
+                    print(f'  - {error}')
+                sys.exit(1)
+            else:
+                print('✅ Async validation passed')
+                
+        except Exception as e:
+            print(f'❌ Async validation error: {e}')
+            sys.exit(1)
+        "

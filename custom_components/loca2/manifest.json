@@ -1,0 +1,13 @@
+{
+  "domain": "loca2",
+  "name": "Loca2 Device Tracker",
+  "version": "1.0.0",
+  "documentation": "https://github.com/username/loca2-hass",
+  "issue_tracker": "https://github.com/username/loca2-hass/issues",
+  "dependencies": [],
+  "codeowners": ["@username"],
+  "requirements": ["aiohttp>=3.8.0"],
+  "iot_class": "cloud_polling",
+  "config_flow": true,
+  "integration_type": "device"
+}

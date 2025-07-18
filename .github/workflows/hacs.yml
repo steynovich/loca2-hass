@@ -1,0 +1,201 @@
+name: HACS Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly to catch any HACS requirement changes
+    - cron: '0 0 * * 0'
+
+jobs:
+  hacs-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: HACS validation
+      uses: hacs/action@main
+      with:
+        category: integration
+
+  manifest-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Validate manifest structure
+      run: |
+        python -c "
+        import json
+        import sys
+        
+        # Load manifest
+        with open('custom_components/loca2/manifest.json') as f:
+            manifest = json.load(f)
+        
+        # HACS required fields
+        hacs_required = [
+            'domain', 'name', 'version', 'documentation', 'issue_tracker',
+            'codeowners', 'requirements', 'iot_class', 'config_flow'
+        ]
+        
+        errors = []
+        
+        # Check required fields
+        for field in hacs_required:
+            if field not in manifest:
+                errors.append(f'Missing required field: {field}')
+        
+        # Validate field types and formats
+        if 'domain' in manifest:
+            if not isinstance(manifest['domain'], str) or not manifest['domain'].islower():
+                errors.append('Domain must be lowercase string')
+        
+        if 'version' in manifest:
+            version_parts = manifest['version'].split('.')
+            if len(version_parts) < 2:
+                errors.append('Version must be at least MAJOR.MINOR format')
+            for part in version_parts:
+                if not part.isdigit():
+                    errors.append(f'Version part {part} must be numeric')
+        
+        if 'documentation' in manifest:
+            if not manifest['documentation'].startswith(('http://', 'https://')):
+                errors.append('Documentation must be a valid URL')
+        
+        if 'issue_tracker' in manifest:
+            if not manifest['issue_tracker'].startswith(('http://', 'https://')):
+                errors.append('Issue tracker must be a valid URL')
+        
+        if 'codeowners' in manifest:
+            if not isinstance(manifest['codeowners'], list) or len(manifest['codeowners']) == 0:
+                errors.append('Codeowners must be a non-empty list')
+            for owner in manifest['codeowners']:
+                if not owner.startswith('@'):
+                    errors.append(f'Codeowner {owner} must start with @')
+        
+        if 'iot_class' in manifest:
+            valid_classes = ['assumed_state', 'cloud_polling', 'cloud_push', 'local_polling', 'local_push']
+            if manifest['iot_class'] not in valid_classes:
+                errors.append(f'IoT class must be one of: {valid_classes}')
+        
+        if 'config_flow' in manifest:
+            if not isinstance(manifest['config_flow'], bool):
+                errors.append('Config flow must be boolean')
+        
+        if errors:
+            print('❌ Manifest validation failed:')
+            for error in errors:
+                print(f'  - {error}')
+            sys.exit(1)
+        else:
+            print('✅ Manifest validation passed')
+        "
+
+  strings-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Validate strings.json
+      run: |
+        python -c "
+        import json
+        import sys
+        
+        # Load strings
+        with open('custom_components/loca2/strings.json') as f:
+            strings = json.load(f)
+        
+        errors = []
+        
+        # Check required sections
+        if 'config' not in strings:
+            errors.append('Missing config section')
+        else:
+            config = strings['config']
+            if 'step' not in config:
+                errors.append('Missing config.step section')
+            if 'error' not in config:
+                errors.append('Missing config.error section')
+            
+            if 'step' in config:
+                if 'user' not in config['step']:
+                    errors.append('Missing config.step.user section')
+        
+        if errors:
+            print('❌ Strings validation failed:')
+            for error in errors:
+                print(f'  - {error}')
+            sys.exit(1)
+        else:
+            print('✅ Strings validation passed')
+        "
+
+  integration-structure:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Validate integration structure
+      run: |
+        python -c "
+        import os
+        import sys
+        
+        # Required files for HACS
+        required_files = [
+            'custom_components/loca2/__init__.py',
+            'custom_components/loca2/manifest.json',
+            'custom_components/loca2/strings.json',
+            'custom_components/loca2/config_flow.py',
+            'custom_components/loca2/device_tracker.py',
+            'custom_components/loca2/const.py',
+            'custom_components/loca2/api.py'
+        ]
+        
+        errors = []
+        
+        for file_path in required_files:
+            if not os.path.exists(file_path):
+                errors.append(f'Missing required file: {file_path}')
+            elif os.path.getsize(file_path) == 0:
+                errors.append(f'Empty file: {file_path}')
+        
+        # Check __init__.py has required functions
+        if os.path.exists('custom_components/loca2/__init__.py'):
+            with open('custom_components/loca2/__init__.py') as f:
+                init_content = f.read()
+                if 'async def async_setup_entry' not in init_content:
+                    errors.append('Missing async_setup_entry function in __init__.py')
+                if 'async def async_unload_entry' not in init_content:
+                    errors.append('Missing async_unload_entry function in __init__.py')
+        
+        # Check config_flow.py has required class
+        if os.path.exists('custom_components/loca2/config_flow.py'):
+            with open('custom_components/loca2/config_flow.py') as f:
+                config_flow_content = f.read()
+                if 'ConfigFlow' not in config_flow_content:
+                    errors.append('Missing ConfigFlow class in config_flow.py')
+                if 'async def async_step_user' not in config_flow_content:
+                    errors.append('Missing async_step_user method in config_flow.py')
+        
+        if errors:
+            print('❌ Integration structure validation failed:')
+            for error in errors:
+                print(f'  - {error}')
+            sys.exit(1)
+        else:
+            print('✅ Integration structure validation passed')
+        "

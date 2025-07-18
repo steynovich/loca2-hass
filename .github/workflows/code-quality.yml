@@ -1,0 +1,156 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv add ruff black mypy --no-sync
+
+    - name: Lint with ruff
+      run: |
+        uv run ruff check custom_components/ tests/ --output-format=github
+
+    - name: Check formatting with black
+      run: |
+        uv run black --check --diff custom_components/ tests/
+
+    - name: Type check with mypy
+      run: |
+        uv run mypy custom_components/loca2/ --ignore-missing-imports
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install bandit
+      run: |
+        uv add "bandit[toml]" --no-sync
+
+    - name: Run security scan
+      run: |
+        uv run bandit -r custom_components/ -f json -o bandit-report.json || true
+
+    - name: Upload security scan results
+      uses: actions/upload-artifact@v3
+      with:
+        name: bandit-report
+        path: bandit-report.json
+
+  complexity:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install complexity tools
+      run: |
+        uv add radon xenon --no-sync
+
+    - name: Check cyclomatic complexity
+      run: |
+        uv run radon cc custom_components/ -a -nb
+
+    - name: Check maintainability index
+      run: |
+        uv run radon mi custom_components/ -nb
+
+    - name: Check complexity with xenon
+      run: |
+        uv run xenon --max-absolute B --max-modules A --max-average A custom_components/
+
+  documentation:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv add pydocstyle --no-sync
+
+    - name: Check docstring style
+      run: |
+        uv run pydocstyle custom_components/loca2/ --convention=google
+
+  dependency-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Install safety
+      run: |
+        uv add safety --no-sync
+
+    - name: Check dependencies for security vulnerabilities
+      run: |
+        uv run safety check --json --output safety-report.json || true
+
+    - name: Upload safety report
+      uses: actions/upload-artifact@v3
+      with:
+        name: safety-report
+        path: safety-report.json
