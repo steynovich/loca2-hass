@@ -193,10 +193,10 @@ class Loca2DataUpdateCoordinator(DataUpdateCoordinator):
   "domain": "loca2",
   "name": "Loca2 Device Tracker",
   "version": "1.0.0",
-  "documentation": "https://github.com/username/loca2-hass",
-  "issue_tracker": "https://github.com/username/loca2-hass/issues",
+  "documentation": "https://github.com/steynovich/loca2-hass",
+  "issue_tracker": "https://github.com/steynovich/loca2-hass/issues",
   "dependencies": [],
-  "codeowners": ["@username"],
+  "codeowners": ["@steynovich"],
   "requirements": ["aiohttp>=3.8.0"],
   "iot_class": "cloud_polling",
   "config_flow": true

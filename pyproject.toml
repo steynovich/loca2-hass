@@ -52,9 +52,9 @@ dev = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/username/loca2-hass"
-"Bug Reports" = "https://github.com/username/loca2-hass/issues"
-"Source" = "https://github.com/username/loca2-hass"
+"Homepage" = "https://github.com/steynovich/loca2-hass"
+"Bug Reports" = "https://github.com/steynovich/loca2-hass/issues"
+"Source" = "https://github.com/steynovich/loca2-hass"
 
 [tool.setuptools_scm]
 write_to = "custom_components/loca2/_version.py"

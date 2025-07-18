@@ -1,13 +1,13 @@
 # Loca2 Device Tracker for Home Assistant
 
-[![CI](https://github.com/username/loca2-hass/workflows/CI/badge.svg)](https://github.com/username/loca2-hass/actions/workflows/ci.yml)
-[![HACS Validation](https://github.com/username/loca2-hass/workflows/HACS%20Validation/badge.svg)](https://github.com/username/loca2-hass/actions/workflows/hacs.yml)
-[![Home Assistant Validation](https://github.com/username/loca2-hass/workflows/Home%20Assistant%20Validation/badge.svg)](https://github.com/username/loca2-hass/actions/workflows/hassfest.yml)
-[![Code Quality](https://github.com/username/loca2-hass/workflows/Code%20Quality/badge.svg)](https://github.com/username/loca2-hass/actions/workflows/code-quality.yml)
-[![codecov](https://codecov.io/gh/username/loca2-hass/branch/main/graph/badge.svg)](https://codecov.io/gh/username/loca2-hass)
+[![CI](https://github.com/steynovich/loca2-hass/workflows/CI/badge.svg)](https://github.com/steynovich/loca2-hass/actions/workflows/ci.yml)
+[![HACS Validation](https://github.com/steynovich/loca2-hass/workflows/HACS%20Validation/badge.svg)](https://github.com/steynovich/loca2-hass/actions/workflows/hacs.yml)
+[![Home Assistant Validation](https://github.com/steynovich/loca2-hass/workflows/Home%20Assistant%20Validation/badge.svg)](https://github.com/steynovich/loca2-hass/actions/workflows/hassfest.yml)
+[![Code Quality](https://github.com/steynovich/loca2-hass/workflows/Code%20Quality/badge.svg)](https://github.com/steynovich/loca2-hass/actions/workflows/code-quality.yml)
+[![codecov](https://codecov.io/gh/steynovich/loca2-hass/branch/main/graph/badge.svg)](https://codecov.io/gh/steynovich/loca2-hass)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
-[![GitHub release](https://img.shields.io/github/release/username/loca2-hass.svg)](https://github.com/username/loca2-hass/releases)
-[![License](https://img.shields.io/github/license/username/loca2-hass.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/release/steynovich/loca2-hass.svg)](https://github.com/steynovich/loca2-hass/releases)
+[![License](https://img.shields.io/github/license/steynovich/loca2-hass.svg)](LICENSE)
 
 A Home Assistant integration that tracks the location of Loca2 devices through their RESTful API. This integration provides device tracker entities for each Loca2 device, enabling location-based automations and monitoring within Home Assistant.
 
@@ -28,7 +28,7 @@ A Home Assistant integration that tracks the location of Loca2 devices through t
 2. Go to "Integrations"
 3. Click the three dots in the top right corner
 4. Select "Custom repositories"
-5. Add this repository URL: `https://github.com/username/loca2-hass`
+5. Add this repository URL: `https://github.com/steynovich/loca2-hass`
 6. Select "Integration" as the category
 7. Click "Add"
 8. Find "Loca2 Device Tracker" in the integration list
@@ -37,7 +37,7 @@ A Home Assistant integration that tracks the location of Loca2 devices through t
 
 ### Manual Installation
 
-1. Download the latest release from the [releases page](https://github.com/username/loca2-hass/releases)
+1. Download the latest release from the [releases page](https://github.com/steynovich/loca2-hass/releases)
 2. Extract the contents
 3. Copy the `custom_components/loca2` folder to your Home Assistant `custom_components` directory
 4. Restart Home Assistant
@@ -171,7 +171,7 @@ This integration requires:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/username/loca2-hass.git
+   git clone https://github.com/steynovich/loca2-hass.git
    cd loca2-hass
    ```
 
@@ -265,9 +265,9 @@ Contributions are welcome! Please:
 
 ## Support
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/username/loca2-hass/issues)
-- 💡 **Feature Requests**: [GitHub Issues](https://github.com/username/loca2-hass/issues)
-- 📖 **Documentation**: [GitHub Wiki](https://github.com/username/loca2-hass/wiki)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/steynovich/loca2-hass/issues)
+- 💡 **Feature Requests**: [GitHub Issues](https://github.com/steynovich/loca2-hass/issues)
+- 📖 **Documentation**: [GitHub Wiki](https://github.com/steynovich/loca2-hass/wiki)
 
 ## License
 

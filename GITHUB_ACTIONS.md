@@ -138,11 +138,11 @@ This document describes the GitHub Actions workflows implemented for the Loca2 H
 The following badges are available for the README:
 
 ```markdown
-[![CI](https://github.com/username/loca2-hass/workflows/CI/badge.svg)](https://github.com/username/loca2-hass/actions/workflows/ci.yml)
-[![HACS Validation](https://github.com/username/loca2-hass/workflows/HACS%20Validation/badge.svg)](https://github.com/username/loca2-hass/actions/workflows/hacs.yml)
-[![Home Assistant Validation](https://github.com/username/loca2-hass/workflows/Home%20Assistant%20Validation/badge.svg)](https://github.com/username/loca2-hass/actions/workflows/hassfest.yml)
-[![Code Quality](https://github.com/username/loca2-hass/workflows/Code%20Quality/badge.svg)](https://github.com/username/loca2-hass/actions/workflows/code-quality.yml)
-[![codecov](https://codecov.io/gh/username/loca2-hass/branch/main/graph/badge.svg)](https://codecov.io/gh/username/loca2-hass)
+[![CI](https://github.com/steynovich/loca2-hass/workflows/CI/badge.svg)](https://github.com/steynovich/loca2-hass/actions/workflows/ci.yml)
+[![HACS Validation](https://github.com/steynovich/loca2-hass/workflows/HACS%20Validation/badge.svg)](https://github.com/steynovich/loca2-hass/actions/workflows/hacs.yml)
+[![Home Assistant Validation](https://github.com/steynovich/loca2-hass/workflows/Home%20Assistant%20Validation/badge.svg)](https://github.com/steynovich/loca2-hass/actions/workflows/hassfest.yml)
+[![Code Quality](https://github.com/steynovich/loca2-hass/workflows/Code%20Quality/badge.svg)](https://github.com/steynovich/loca2-hass/actions/workflows/code-quality.yml)
+[![codecov](https://codecov.io/gh/steynovich/loca2-hass/branch/main/graph/badge.svg)](https://codecov.io/gh/steynovich/loca2-hass)
 ```
 
 ## Automated Features
