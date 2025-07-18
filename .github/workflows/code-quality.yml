@@ -64,7 +64,7 @@ jobs:
         uv run bandit -r custom_components/ -f json -o bandit-report.json || true
 
     - name: Upload security scan results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: bandit-report
         path: bandit-report.json
@@ -150,7 +150,7 @@ jobs:
         uv run safety check --json --output safety-report.json || true
 
     - name: Upload safety report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: safety-report
         path: safety-report.json
