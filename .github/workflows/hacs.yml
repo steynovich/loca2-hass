@@ -199,3 +199,52 @@ jobs:
         else:
             print('✅ Integration structure validation passed')
         "
+
+  hacs-requirements:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Validate HACS requirements
+      run: |
+        echo "🔍 Validating HACS requirements..."
+        
+        # Check for required files
+        required_files=(
+          "hacs.json"
+          "README.md"
+          "custom_components/loca2/manifest.json"
+          "custom_components/loca2/__init__.py"
+          "custom_components/loca2/config_flow.py"
+        )
+        
+        missing_files=()
+        for file in "${required_files[@]}"; do
+          if [[ ! -f "$file" ]]; then
+            missing_files+=("$file")
+          fi
+        done
+        
+        if [[ ${#missing_files[@]} -gt 0 ]]; then
+          echo "❌ Missing required files:"
+          printf '  - %s\n' "${missing_files[@]}"
+          exit 1
+        fi
+        
+        # Validate JSON files
+        if ! python -c "import json; json.load(open('hacs.json'))" 2>/dev/null; then
+          echo "❌ Invalid hacs.json format"
+          exit 1
+        fi
+        
+        if ! python -c "import json; json.load(open('custom_components/loca2/manifest.json'))" 2>/dev/null; then
+          echo "❌ Invalid manifest.json format"
+          exit 1
+        fi
+        
+        echo "✅ All HACS requirements validated successfully"
+        
+        # Display current configuration
+        echo "📄 Current hacs.json configuration:"
+        cat hacs.json | python -m json.tool

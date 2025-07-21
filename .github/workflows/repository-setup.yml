@@ -1,0 +1,96 @@
+name: Repository Setup
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'README.md'
+      - 'hacs.json'
+      - 'custom_components/loca2/manifest.json'
+
+jobs:
+  configure-repository:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Configure repository metadata
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "🔧 Configuring repository metadata for HACS compliance..."
+        
+        # Set repository description and topics
+        response=$(curl -s -X PATCH \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }} \
+          -d '{
+            "description": "Home Assistant integration for Loca2 device tracking - Monitor and track Loca2 devices with real-time location updates, battery monitoring, and automation support",
+            "topics": ["home-assistant", "hacs", "device-tracker", "loca2", "location-tracking", "integration", "custom-component", "iot", "automation", "home-automation"]
+          }')
+        
+        if echo "$response" | grep -q '"message"'; then
+          echo "❌ Failed to update repository metadata:"
+          echo "$response" | jq -r '.message // .'
+          exit 1
+        else
+          echo "✅ Repository description and topics configured successfully"
+        fi
+        
+        # Verify the changes
+        echo "📋 Current repository configuration:"
+        curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          https://api.github.com/repos/${{ github.repository }} | \
+          jq -r '"Description: " + (.description // "None") + "\nTopics: " + (.topics | join(", "))'
+    
+    - name: Validate HACS requirements
+      run: |
+        echo "🔍 Validating HACS requirements..."
+        
+        # Check for required files
+        required_files=(
+          "hacs.json"
+          "custom_components/loca2/manifest.json"
+          "custom_components/loca2/__init__.py"
+          "custom_components/loca2/config_flow.py"
+          "README.md"
+        )
+        
+        missing_files=()
+        for file in "${required_files[@]}"; do
+          if [[ ! -f "$file" ]]; then
+            missing_files+=("$file")
+          fi
+        done
+        
+        if [[ ${#missing_files[@]} -gt 0 ]]; then
+          echo "❌ Missing required files:"
+          printf '  - %s\n' "${missing_files[@]}"
+          exit 1
+        fi
+        
+        # Validate hacs.json
+        if ! jq empty hacs.json 2>/dev/null; then
+          echo "❌ Invalid hacs.json format"
+          exit 1
+        fi
+        
+        # Validate manifest.json
+        if ! jq empty custom_components/loca2/manifest.json 2>/dev/null; then
+          echo "❌ Invalid manifest.json format"
+          exit 1
+        fi
+        
+        echo "✅ All HACS requirements validated successfully"
+        
+        # Display current configuration
+        echo "📄 Current hacs.json configuration:"
+        jq . hacs.json
+        
+        echo "📄 Current manifest.json configuration:"
+        jq . custom_components/loca2/manifest.json
