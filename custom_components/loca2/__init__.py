@@ -793,7 +793,6 @@ class Loca2DataUpdateCoordinator(DataUpdateCoordinator[dict[str, Loca2Device]]):
         self, availability: float, error_rate_1h: float
     ) -> str:
         """Calculate overall health status based on multiple metrics."""
-
         # Critical issues
         if self._consecutive_errors >= 10 or availability < 50.0:
             return HEALTH_STATUS_UNHEALTHY

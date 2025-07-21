@@ -147,7 +147,7 @@ jobs:
 
     - name: Check dependencies for security vulnerabilities
       run: |
-        safety check --json --output safety-report.json || true
+        safety check --json > safety-report.json || true
 
     - name: Upload safety report
       uses: actions/upload-artifact@v4
