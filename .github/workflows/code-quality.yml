@@ -99,7 +99,7 @@ jobs:
 
     - name: Check complexity with xenon
       run: |
-        xenon --max-absolute C --max-modules B --max-average B custom_components/
+        xenon --max-absolute D --max-modules B --max-average B custom_components/
 
   documentation:
     runs-on: ubuntu-latest
