@@ -1,0 +1,8 @@
+{
+  "name": "Loca2 Device Tracker",
+  "content_in_root": false,
+  "filename": "loca2.zip",
+  "country": ["US", "CA", "GB", "AU", "NZ"],
+  "render_readme": true,
+  "iot_class": "Cloud Polling"
+}
