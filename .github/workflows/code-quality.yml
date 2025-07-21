@@ -25,19 +25,19 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install ruff black mypy
+        uv pip install --system ruff black mypy
 
     - name: Lint with ruff
       run: |
-        uv run ruff check custom_components/ tests/ --output-format=github
+        ruff check custom_components/ tests/ --output-format=github
 
     - name: Check formatting with black
       run: |
-        uv run black --check --diff custom_components/ tests/
+        black --check --diff custom_components/ tests/
 
     - name: Type check with mypy
       run: |
-        uv run mypy custom_components/loca2/ --ignore-missing-imports
+        mypy custom_components/loca2/ --ignore-missing-imports
 
   security:
     runs-on: ubuntu-latest
@@ -57,11 +57,11 @@ jobs:
 
     - name: Install bandit
       run: |
-        uv pip install "bandit[toml]"
+        uv pip install --system "bandit[toml]"
 
     - name: Run security scan
       run: |
-        uv run bandit -r custom_components/ -f json -o bandit-report.json || true
+        bandit -r custom_components/ -f json -o bandit-report.json || true
 
     - name: Upload security scan results
       uses: actions/upload-artifact@v4
@@ -87,19 +87,19 @@ jobs:
 
     - name: Install complexity tools
       run: |
-        uv pip install radon xenon
+        uv pip install --system radon xenon
 
     - name: Check cyclomatic complexity
       run: |
-        uv run radon cc custom_components/ -a -nb
+        radon cc custom_components/ -a -nb
 
     - name: Check maintainability index
       run: |
-        uv run radon mi custom_components/ -nb
+        radon mi custom_components/ -nb
 
     - name: Check complexity with xenon
       run: |
-        uv run xenon --max-absolute B --max-modules A --max-average A custom_components/
+        xenon --max-absolute B --max-modules A --max-average A custom_components/
 
   documentation:
     runs-on: ubuntu-latest
@@ -119,11 +119,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install pydocstyle
+        uv pip install --system pydocstyle
 
     - name: Check docstring style
       run: |
-        uv run pydocstyle custom_components/loca2/ --convention=google
+        pydocstyle custom_components/loca2/ --convention=google
 
   dependency-check:
     runs-on: ubuntu-latest
@@ -143,11 +143,11 @@ jobs:
 
     - name: Install safety
       run: |
-        uv pip install safety
+        uv pip install --system safety
 
     - name: Check dependencies for security vulnerabilities
       run: |
-        uv run safety check --json --output safety-report.json || true
+        safety check --json --output safety-report.json || true
 
     - name: Upload safety report
       uses: actions/upload-artifact@v4

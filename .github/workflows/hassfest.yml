@@ -34,11 +34,11 @@ jobs:
 
     - name: Install Home Assistant
       run: |
-        uv pip install homeassistant
+        uv pip install --system homeassistant
 
     - name: Test integration loading
       run: |
-        uv run python -c "
+        python -c "
         import sys
         import os
         sys.path.insert(0, os.getcwd())
@@ -73,7 +73,7 @@ jobs:
 
     - name: Validate manifest against Home Assistant requirements
       run: |
-        uv run python -c "
+        python -c "
         import json
         import sys
         
@@ -137,11 +137,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install homeassistant aiohttp
+        uv pip install --system homeassistant aiohttp
 
     - name: Validate async implementation
       run: |
-        uv run python -c "
+        python -c "
         import sys
         import os
         import inspect
