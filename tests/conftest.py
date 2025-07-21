@@ -1,4 +1,5 @@
 """Global fixtures for Loca2 integration tests."""
+
 import pytest
 
 # Import the Home Assistant test fixtures

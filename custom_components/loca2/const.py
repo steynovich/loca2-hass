@@ -1,19 +1,20 @@
 """Constants for the Loca2 integration."""
+
 from datetime import timedelta
+
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.const import (
     CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
     CONF_TIMEOUT,
-    CONF_URL,
     CONF_USERNAME,
 )
-import homeassistant.helpers.config_validation as cv
 
 # Integration domain
 DOMAIN = "loca2"
 
-# Configuration constants  
+# Configuration constants
 CONF_BASE_URL = "base_url"
 CONF_ENABLED_DEVICES = "enabled_devices"
 CONF_DISABLED_DEVICES = "disabled_devices"
@@ -36,24 +37,30 @@ ATTR_DEVICE_TYPE = "device_type"
 ATTR_GPS_ACCURACY = "gps_accuracy"
 
 # Configuration schema
-CONFIG_SCHEMA = vol.Schema({
-    vol.Required(CONF_USERNAME): cv.string,
-    vol.Required(CONF_PASSWORD): cv.string,
-    vol.Optional(CONF_BASE_URL, default=DEFAULT_BASE_URL): cv.url,
-    vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
-        cv.positive_int, vol.Range(min=MIN_SCAN_INTERVAL, max=MAX_SCAN_INTERVAL)
-    ),
-    vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
-})
+CONFIG_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_USERNAME): cv.string,
+        vol.Required(CONF_PASSWORD): cv.string,
+        vol.Optional(CONF_BASE_URL, default=DEFAULT_BASE_URL): cv.url,
+        vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
+            cv.positive_int, vol.Range(min=MIN_SCAN_INTERVAL, max=MAX_SCAN_INTERVAL)
+        ),
+        vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
+    }
+)
 
 # Options schema for config flow
-OPTIONS_SCHEMA = vol.Schema({
-    vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
-        cv.positive_int, vol.Range(min=MIN_SCAN_INTERVAL, max=MAX_SCAN_INTERVAL)
-    ),
-    vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
-    vol.Optional(CONF_DISABLED_DEVICES, default=[]): vol.All(cv.ensure_list, [cv.string]),
-})
+OPTIONS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): vol.All(
+            cv.positive_int, vol.Range(min=MIN_SCAN_INTERVAL, max=MAX_SCAN_INTERVAL)
+        ),
+        vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
+        vol.Optional(CONF_DISABLED_DEVICES, default=[]): vol.All(
+            cv.ensure_list, [cv.string]
+        ),
+    }
+)
 
 # Update interval
 UPDATE_INTERVAL = timedelta(seconds=DEFAULT_SCAN_INTERVAL)
@@ -90,8 +97,12 @@ LOG_LEVEL_PERFORMANCE = "info"
 
 # Structured logging format templates
 LOG_FORMAT_ERROR = "Loca2 error [%(category)s:%(error_type)s] after %(duration).2fs: %(message)s (consecutive: %(consecutive)d, context: %(context)s)"
-LOG_FORMAT_RECOVERY = "Loca2 recovery: %(message)s (downtime: %(downtime).1fs, attempts: %(attempts)d)"
-LOG_FORMAT_PERFORMANCE = "Loca2 performance: %(operation)s completed in %(duration).2fs (%(details)s)"
+LOG_FORMAT_RECOVERY = (
+    "Loca2 recovery: %(message)s (downtime: %(downtime).1fs, attempts: %(attempts)d)"
+)
+LOG_FORMAT_PERFORMANCE = (
+    "Loca2 performance: %(operation)s completed in %(duration).2fs (%(details)s)"
+)
 LOG_FORMAT_DIAGNOSTIC = "Loca2 diagnostic [%(component)s]: %(message)s"
 
 # Enhanced diagnostic collection intervals

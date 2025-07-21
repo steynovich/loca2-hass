@@ -25,7 +25,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv add ruff black mypy --no-sync
+        uv pip install ruff black mypy
 
     - name: Lint with ruff
       run: |
@@ -57,7 +57,7 @@ jobs:
 
     - name: Install bandit
       run: |
-        uv add "bandit[toml]" --no-sync
+        uv pip install "bandit[toml]"
 
     - name: Run security scan
       run: |
@@ -87,7 +87,7 @@ jobs:
 
     - name: Install complexity tools
       run: |
-        uv add radon xenon --no-sync
+        uv pip install radon xenon
 
     - name: Check cyclomatic complexity
       run: |
@@ -119,7 +119,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv add pydocstyle --no-sync
+        uv pip install pydocstyle
 
     - name: Check docstring style
       run: |
@@ -143,7 +143,7 @@ jobs:
 
     - name: Install safety
       run: |
-        uv add safety --no-sync
+        uv pip install safety
 
     - name: Check dependencies for security vulnerabilities
       run: |

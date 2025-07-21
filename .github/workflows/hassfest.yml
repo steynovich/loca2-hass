@@ -34,7 +34,7 @@ jobs:
 
     - name: Install Home Assistant
       run: |
-        uv add homeassistant --no-sync
+        uv pip install homeassistant
 
     - name: Test integration loading
       run: |
@@ -137,7 +137,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv add homeassistant aiohttp --no-sync
+        uv pip install homeassistant aiohttp
 
     - name: Validate async implementation
       run: |
