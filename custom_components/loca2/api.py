@@ -150,7 +150,11 @@ class Loca2Device:
         zipcode = spot_data.get("zipcode") if spot_data else None
 
         # Status information from History
-        battery_level = cls._convert_battery_level(history_data.get("charge")) if history_data else None
+        battery_level = (
+            cls._convert_battery_level(history_data.get("charge"))
+            if history_data
+            else None
+        )
         last_seen = (
             cls._convert_timestamp(history_data.get("time")) if history_data else None
         )

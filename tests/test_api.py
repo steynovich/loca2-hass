@@ -116,7 +116,7 @@ class TestLoca2Device:
             },
             "History": {
                 "time": "invalid-date",
-            }
+            },
         }
         device = Loca2Device.from_dict(data)
 
