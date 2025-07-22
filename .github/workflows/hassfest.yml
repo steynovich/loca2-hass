@@ -38,20 +38,47 @@ jobs:
 
     - name: Test integration loading
       run: |
-        python -c "
+        uv run python -c "
         import sys
         import os
+        import traceback
         sys.path.insert(0, os.getcwd())
         
+        print('🔍 Testing integration component imports...')
+        print(f'Python version: {sys.version}')
+        print(f'Working directory: {os.getcwd()}')
+        
         try:
+            print('📦 Importing main entry points...')
             from custom_components.loca2 import async_setup_entry, async_unload_entry
+            print('✅ Entry points imported')
+            
+            print('📦 Importing config flow...')
             from custom_components.loca2.config_flow import Loca2ConfigFlow
+            print('✅ Config flow imported')
+            
+            print('📦 Importing API components...')
             from custom_components.loca2.api import Loca2ApiClient, Loca2Device, Loca2Location
+            print('✅ API components imported')
+            
+            print('📦 Importing device tracker...')
             from custom_components.loca2.device_tracker import Loca2DeviceTracker
+            print('✅ Device tracker imported')
+            
+            print('📦 Importing constants...')
             from custom_components.loca2.const import DOMAIN
+            print('✅ Constants imported')
+            
             print('✅ All integration components imported successfully')
         except ImportError as e:
             print(f'❌ Import error: {e}')
+            print('📋 Traceback:')
+            traceback.print_exc()
+            sys.exit(1)
+        except Exception as e:
+            print(f'❌ Unexpected error: {e}')
+            print('📋 Traceback:')
+            traceback.print_exc()
             sys.exit(1)
         "
 
@@ -77,7 +104,7 @@ jobs:
 
     - name: Validate manifest against Home Assistant requirements
       run: |
-        python -c "
+        uv run python -c "
         import json
         import sys
         

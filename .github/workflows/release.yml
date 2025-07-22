@@ -60,7 +60,7 @@ jobs:
 
     - name: Update manifest version
       run: |
-        python -c "
+        uv run python -c "
         import json
         with open('custom_components/loca2/manifest.json', 'r') as f:
             manifest = json.load(f)
