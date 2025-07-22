@@ -32,11 +32,36 @@ def api_client():
 def mock_device_data():
     """Mock device data from API."""
     return {
-        "id": "device123",
-        "name": "Test Device",
-        "type": "tracker",
-        "battery_level": 85,
-        "last_seen": "2023-12-01T10:30:00Z",
+        "Asset": {
+            "id": "device123",
+            "label": "Test Device",
+            "type": 1,
+        },
+        "Device": {
+            "id": 456,
+            "type": 1,
+            "version": 1,
+        },
+        "Spot": {
+            "latitude": 37.7749,
+            "longitude": -122.4194,
+            "street": "Main St",
+            "number": "123",
+            "city": "San Francisco",
+            "state": "CA",
+            "country": "USA",
+            "zipcode": "94102",
+            "time": 1701424200.0,  # 2023-12-01T10:30:00Z as Unix timestamp
+        },
+        "History": {
+            "charge": "85%",
+            "time": 1701424200.0,  # 2023-12-01T10:30:00Z as Unix timestamp
+            "speed": 0.0,
+            "motion": 0,
+            "strength": 4,
+            "HDOP": 10.5,
+            "SATU": 8,
+        },
     }
 
 
@@ -61,18 +86,22 @@ class TestLoca2Device:
 
         assert device.id == "device123"
         assert device.name == "Test Device"
-        assert device.device_type == "tracker"
+        assert device.device_type == "gps_tracker"
         assert device.battery_level == 85
         assert device.last_seen is not None
         assert device.last_seen.year == 2023
+        assert device.latitude == 37.7749
+        assert device.longitude == -122.4194
+        assert device.address == "Main St 123"
+        assert device.city == "San Francisco"
 
     def test_from_dict_minimal_data(self):
         """Test creating device from minimal data."""
-        data = {"id": "device456"}
+        data = {"Asset": {"id": "device456", "label": "Minimal Device", "type": 0}}
         device = Loca2Device.from_dict(data)
 
         assert device.id == "device456"
-        assert device.name == "Device device456"
+        assert device.name == "Minimal Device"
         assert device.device_type == "unknown"
         assert device.battery_level is None
         assert device.last_seen is None
@@ -80,9 +109,14 @@ class TestLoca2Device:
     def test_from_dict_invalid_date(self):
         """Test handling invalid date format."""
         data = {
-            "id": "device789",
-            "name": "Test Device",
-            "last_seen": "invalid-date",
+            "Asset": {
+                "id": "device789",
+                "label": "Test Device",
+                "type": 1,
+            },
+            "History": {
+                "time": "invalid-date",
+            }
         }
         device = Loca2Device.from_dict(data)
 
@@ -90,19 +124,19 @@ class TestLoca2Device:
         assert device.last_seen is None
 
     def test_validation_missing_id(self):
-        """Test validation fails when ID is missing."""
-        with pytest.raises(ValueError, match="Device data must contain 'id' field"):
+        """Test validation fails when Asset data is missing."""
+        with pytest.raises(ValueError, match="Asset data is required"):
             Loca2Device.from_dict({"name": "Test Device"})
 
     def test_validation_empty_id(self):
-        """Test validation fails when ID is empty."""
-        with pytest.raises(ValueError, match="id cannot be empty"):
-            Loca2Device.from_dict({"id": ""})
+        """Test validation fails when Asset ID is empty."""
+        with pytest.raises(ValueError, match="Device ID must be a non-empty string"):
+            Loca2Device.from_dict({"Asset": {"id": "", "label": "Test"}})
 
     def test_validation_none_id(self):
         """Test validation fails when ID is None."""
-        with pytest.raises(ValueError, match="id cannot be None"):
-            Loca2Device.from_dict({"id": None})
+        with pytest.raises(ValueError, match="Device ID must be a non-empty string"):
+            Loca2Device.from_dict({"Asset": {"id": None, "label": "Test"}})
 
     def test_validation_invalid_data_type(self):
         """Test validation fails when data is not a dictionary."""
