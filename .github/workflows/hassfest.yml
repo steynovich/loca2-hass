@@ -145,37 +145,66 @@ jobs:
 
     - name: Validate async implementation
       run: |
-        python -c "
+        uv run python -c "
         import sys
         import os
         import inspect
+        import traceback
         sys.path.insert(0, os.getcwd())
         
         try:
+            print('🔍 Starting async validation...')
+            print(f'Python version: {sys.version}')
+            print(f'Working directory: {os.getcwd()}')
+            
+            print('📦 Importing main entry points...')
             from custom_components.loca2 import async_setup_entry, async_unload_entry
+            print('✅ Successfully imported entry points')
+            
+            print('📦 Importing API client...')
             from custom_components.loca2.api import Loca2ApiClient
+            print('✅ Successfully imported API client')
+            
+            print('📦 Importing device tracker...')
             from custom_components.loca2.device_tracker import Loca2DeviceTracker
+            print('✅ Successfully imported device tracker')
             
             errors = []
             
             # Check main entry points are async
+            print('🔍 Validating main entry points...')
             if not inspect.iscoroutinefunction(async_setup_entry):
                 errors.append('async_setup_entry must be async')
+            else:
+                print('✅ async_setup_entry is async')
+                
             if not inspect.iscoroutinefunction(async_unload_entry):
                 errors.append('async_unload_entry must be async')
+            else:
+                print('✅ async_unload_entry is async')
             
             # Check API client methods are async
+            print('🔍 Validating API client methods...')
             api_methods = ['test_connection', 'get_devices', 'get_device_location', 'close']
             for method_name in api_methods:
                 if hasattr(Loca2ApiClient, method_name):
                     method = getattr(Loca2ApiClient, method_name)
                     if not inspect.iscoroutinefunction(method):
                         errors.append(f'API method {method_name} must be async')
+                    else:
+                        print(f'✅ API method {method_name} is async')
+                else:
+                    errors.append(f'API method {method_name} not found')
             
             # Check device tracker update method is async
+            print('🔍 Validating device tracker methods...')
             if hasattr(Loca2DeviceTracker, 'async_update'):
                 if not inspect.iscoroutinefunction(Loca2DeviceTracker.async_update):
                     errors.append('DeviceTracker.async_update must be async')
+                else:
+                    print('✅ DeviceTracker.async_update is async')
+            else:
+                errors.append('DeviceTracker.async_update method not found')
             
             if errors:
                 print('❌ Async validation failed:')
@@ -183,9 +212,16 @@ jobs:
                     print(f'  - {error}')
                 sys.exit(1)
             else:
-                print('✅ Async validation passed')
+                print('✅ Async validation passed - all methods are properly async')
                 
+        except ImportError as e:
+            print(f'❌ Import error during async validation: {e}')
+            print('📋 Traceback:')
+            traceback.print_exc()
+            sys.exit(1)
         except Exception as e:
-            print(f'❌ Async validation error: {e}')
+            print(f'❌ Unexpected error during async validation: {e}')
+            print('📋 Traceback:')
+            traceback.print_exc()
             sys.exit(1)
         "
