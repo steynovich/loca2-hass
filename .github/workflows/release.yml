@@ -53,9 +53,14 @@ jobs:
       id: get_version
       run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "latest"
+
     - name: Update manifest version
       run: |
-        uv run python -c "
+        python -c "
         import json
         with open('custom_components/loca2/manifest.json', 'r') as f:
             manifest = json.load(f)
@@ -70,15 +75,13 @@ jobs:
         zip -r ../loca2-${{ steps.get_version.outputs.VERSION }}.zip loca2/
 
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ steps.get_version.outputs.VERSION }}
-        body: |
-          ## Changes in this Release
+      run: |
+        gh release create "v${{ steps.get_version.outputs.VERSION }}" \
+          "./loca2-${{ steps.get_version.outputs.VERSION }}.zip" \
+          --title "Release ${{ steps.get_version.outputs.VERSION }}" \
+          --notes "## Changes in this Release
           
           ### Features
           - Loca2 device tracking integration for Home Assistant
@@ -87,8 +90,8 @@ jobs:
           - HACS compatible installation and updates
           
           ### Installation
-          1. Download the `loca2-${{ steps.get_version.outputs.VERSION }}.zip` file
-          2. Extract to your Home Assistant `custom_components` directory
+          1. Download the \`loca2-${{ steps.get_version.outputs.VERSION }}.zip\` file
+          2. Extract to your Home Assistant \`custom_components\` directory
           3. Restart Home Assistant
           4. Add the Loca2 integration via the UI
           
@@ -97,16 +100,4 @@ jobs:
           - Password: Your Loca2 password
           - Base URL: https://www.mijnloca.nl (default)
           
-          See the [README](README.md) for detailed setup instructions.
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./loca2-${{ steps.get_version.outputs.VERSION }}.zip
-        asset_name: loca2-${{ steps.get_version.outputs.VERSION }}.zip
-        asset_content_type: application/zip
+          See the [README](README.md) for detailed setup instructions."

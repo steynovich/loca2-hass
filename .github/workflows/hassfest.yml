@@ -32,9 +32,9 @@ jobs:
       with:
         version: "latest"
 
-    - name: Install Home Assistant
+    - name: Install dependencies
       run: |
-        uv pip install --system homeassistant
+        uv sync --extra dev
 
     - name: Test integration loading
       run: |
@@ -70,6 +70,10 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         version: "latest"
+
+    - name: Install dependencies
+      run: |
+        uv sync --extra dev
 
     - name: Validate manifest against Home Assistant requirements
       run: |
@@ -137,7 +141,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv pip install --system homeassistant aiohttp
+        uv sync --extra dev
 
     - name: Validate async implementation
       run: |

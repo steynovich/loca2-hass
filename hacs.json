@@ -2,5 +2,5 @@
   "name": "Loca2 Device Tracker",
   "content_in_root": false,
   "render_readme": true,
-  "iot_class": "Cloud Polling"
+  "iot_class": "cloud_polling"
 }
